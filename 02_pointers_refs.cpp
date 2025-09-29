@@ -32,38 +32,39 @@ int main() {
     int a = 10;
 
     // ── 指標與參考 ─────────────────────────────────────────────
-    int* p = &a;          // p = 指標，保存變數 a 的位址
-    int& r = a;           // r = 參考，a 的別名
+    int *p = &a; // p = 指標，保存變數 a 的位址
+    int &r = a; // r = 參考，a 的別名
 
     std::cout << "a=" << a << " *p=" << *p << " r=" << r << "\n";
     // *p 解參考 (dereference)：取出 p 指向位址的值
 
-    *p = 20;              // 經由指標修改值 → a 被改成 20
+    *p = 20; // 經由指標修改值 → a 被改成 20
     std::cout << "after *p=20, a=" << a << " r=" << r << "\n";
     // 因為 r 是 a 的別名，所以 r 也同步改變
 
     // ── 陣列與指標運算 (Pointer Arithmetic) ─────────────────────
-    int arr[5] = {1,2,3,4,5};
-    int* p0 = arr;        // 陣列在大部分表達式會 decay 成指向首元素的指標
-    std::cout << "*(p0+2)=" << *(p0+2) << " (pointer arithmetic)\n";
+    int arr[5] = {1, 2, 3, 4, 5};
+    int *p0 = arr; // 陣列在大部分表達式會 decay 成指向首元素的指標
+    std::cout << "*(p0+2)=" << *(p0 + 2) << " (pointer arithmetic)\n";
     // p0+2 → 跳到第 3 個元素 (以 sizeof(int) 為位移單位)
 
     // ── nullptr ───────────────────────────────────────────────
-    int* np = nullptr;    // C++11 引入，比 NULL/0 更安全
+    int *np = nullptr; // C++11 引入，比 NULL/0 更安全
     if (!np) std::cout << "np is nullptr\n";
     // Java 類比：等同 "null" 參考
 
     // ── const pointer vs pointer-to-const ─────────────────────
     const int ci = 7;
 
-    const int* pc = &ci;
+    const int *pc = &ci;
     // "pointer-to-const"：透過 pc 不能修改值，但 pc 可改指向
     // *pc = 8;   // ❌ 編譯錯誤
-    pc = &a;     // ✅ OK，pc 可換指向
+    pc = &a; // ✅ OK，pc 可換指向
 
-    int* const cp = &a;
+    std::cout << "pc=" << pc << "\n";
+    int *const cp = &a;
     // "const pointer"：指標不可換，但可修改指向的值
-    *cp = 99;    // ✅ OK，修改 a 的值
+    *cp = 99; // ✅ OK，修改 a 的值
     // cp = &ci; // ❌ 編譯錯誤，cp 不能改指向
 
     /*
@@ -78,6 +79,12 @@ int main() {
       - 寫 driver/ISR 時：指標 vs 參考差異 → deterministic & safety。
     ───────────────────────────────────────────────────────────
     */
+
+    uint32_t TEST = 0x40000000;
+    std::cout << "test = " << TEST << "\n";
+
+    int test2 = 0x12345678;
+  test2 = 0x12345679;
 
     return 0;
 }

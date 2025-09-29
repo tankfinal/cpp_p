@@ -1,22 +1,46 @@
-/*
-* 題目：LeetCode 104. Maximum Depth of Binary Tree
- * 連結：https://leetcode.com/problems/maximum-depth-of-binary-tree/
- *
- * 【Embedded 對應】
- * - DFS 遞迴：回傳左右子樹最大深度 + 1；簡潔清楚。
- *
- * // LeetCode 既有定義：
- * // struct TreeNode { int val; TreeNode *left; TreeNode *right; TreeNode(): val(0), left(nullptr), right(nullptr) {} TreeNode(int x): val(x), left(nullptr), right(nullptr) {} TreeNode(int x, TreeNode* l, TreeNode* r): val(x), left(l), right(r) {} };
+/**
+* Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left),
+ * right(right) {}
+ * };
  */
-
-struct TreeNode { int val; TreeNode *left, *right; TreeNode(int x): val(x), left(nullptr), right(nullptr) {} };
-
-class Solution_104 {
+class Solution {
 public:
     int maxDepth(TreeNode* root) {
-        if (!root) return 0;
-        int l = maxDepth(root->left);
-        int r = maxDepth(root->right);
-        return 1 + max(l, r);
+        //     if (!root)
+        //         return 0;
+        //     int l = maxDepth(root->left);
+        //     int r = maxDepth(root->right);
+        //     return 1 + std::max(l, r);
+
+        //     if (!root) return 0;
+
+        if (!root)
+            return 0; // 別忘了空樹要處理
+
+        int maxDepth = 0;
+        stack<pair<TreeNode*, int>> st;
+        st.push({root, 1});
+
+        while (!st.empty()) {
+            auto [node, depth] = st.top();
+            st.pop();
+
+            maxDepth = std::max(maxDepth, depth);
+
+            if (node->left) {
+                st.push({node->left, depth + 1});
+            }
+            if (node->right) {
+                st.push({node->right, depth + 1});
+            }
+        }
+        return maxDepth;
     }
 };

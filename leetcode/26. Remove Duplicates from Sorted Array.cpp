@@ -12,16 +12,16 @@
 
 #include <vector>
 using namespace std;
-
 class Solution {
 public:
     int removeDuplicates(vector<int>& nums) {
-        const int n = static_cast<int>(nums.size());
-        if (n == 0) return 0;
-        int write = 1;                                // nums[0] 必保留
-        for (int i = 1; i < n; ++i)
-            if (nums[i] != nums[write - 1])
-                nums[write++] = nums[i];
-        return write;                                 // 新長度；答案在 nums[0..write-1]
+        int w = 1;
+        for (int r = 1 ; r < nums.size() ; ++r) {
+            if (nums[r] != nums[w-1]) {
+                nums[w] = nums[r];
+                w++;
+            }
+        }
+        return w;
     }
 };

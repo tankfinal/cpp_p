@@ -26,3 +26,24 @@ public:
         }
     }
 };
+
+class Solution {
+public:
+    void merge(vector<int>& nums1, int m, vector<int>& nums2, int n) {
+        if (n == 0) return;                 // nums2 沒東西，直接結束
+
+        int i = m - 1;                      // nums1 有效尾
+        int j = n - 1;                      // nums2 尾
+        int k = m + n - 1;                  // 寫入位置（nums1 最尾）
+
+        // 只要 nums2 還有元素，就必須處理；nums1 剩下的本來就在正確位置
+        while (j >= 0) {
+            if (i >= 0 && nums1[i] > nums2[j]) {
+                nums1[k--] = nums1[i--];
+            } else {
+                nums1[k--] = nums2[j--];
+            }
+        }
+    }
+
+};

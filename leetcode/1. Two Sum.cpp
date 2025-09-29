@@ -22,14 +22,16 @@ using namespace std;
 class Solution {
 public:
     vector<int> twoSum(vector<int>& nums, int target) {
-        unordered_map<int, int> pos;                  // 值 → 索引
-        pos.reserve(nums.size());                     // 降 rehash 次數（平滑延遲）
-        for (int i = 0; i < static_cast<int>(nums.size()); ++i) {
-            const int need = target - nums[i];
-            auto it = pos.find(need);                 // 僅查找，不插入
-            if (it != pos.end()) return {it->second, i};
-            pos[nums[i]] = i;                         // 記錄已看過
+        unordered_map<int, int> pos;      // 值 -> 索引
+        pos.reserve(nums.size());         // 小優化：避免多次 rehash
+        for (int i = 0; i < nums.size(); ++i) {
+            int need = target - nums[i];
+            auto it = pos.find(need);
+            if (it != pos.end()) {        // 找到了互補值
+                return {it->second, i};   // 舊索引在前，當前在後
+            }
+            pos[nums[i]] = i;             // 邊掃邊記錄
         }
-        return {};                                    // 題目多半保證有解
+        return {}; // 題目保證有解時可不需要；保險起見留空結果
     }
 };

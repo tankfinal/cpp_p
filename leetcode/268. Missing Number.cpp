@@ -17,11 +17,11 @@ using namespace std;
 
 class Solution {
 public:
-    int missingNumber(vector<int>& nums) {
+    int missingNumber(vector<int> &nums) {
         int n = static_cast<int>(nums.size());
         int x = 0;
-        for (int i = 0; i <= n; ++i) x ^= i;
-        for (int v : nums) x ^= v;
+        for (int i = 0; i <= n; ++i) x ^= i; // 取得全部的xor總數
+        for (int v: nums) x ^= v; // 扣到最後剩下的就是少的
         return x;
     }
 };

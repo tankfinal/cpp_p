@@ -8,17 +8,27 @@
 
 #include <queue>
 using namespace std;
-
 class MovingAverage {
-    int cap;
-    queue<int> q;
-    long long sum = 0;
 public:
-    MovingAverage(int size): cap(size) {}
+    queue<int> cur;
+    size_t cursize;
+    uint32_t sum;
+    MovingAverage(int size) : cursize(size), sum(0) {}
+
     double next(int val) {
+        cur.push(val);
         sum += val;
-        q.push(val);
-        if ((int)q.size() > cap) { sum -= q.front(); q.pop(); }
-        return (double)sum / q.size();
+        while(cur.size() > cursize) {
+            sum -= cur.front();
+            cur.pop();
+        }
+
+        return (static_cast<double>(sum)) / cur.size();
     }
 };
+
+/**
+ * Your MovingAverage object will be instantiated and called as such:
+ * MovingAverage* obj = new MovingAverage(size);
+ * double param_1 = obj->next(val);
+ */

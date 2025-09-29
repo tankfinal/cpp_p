@@ -10,17 +10,46 @@
 using namespace std;
 
 class MinStack {
-    stack<int> s, mins;
 public:
+    stack<int> st;
+    stack<int> mins;
     MinStack() {}
-    void push(int x) {
-        s.push(x);
-        if (mins.empty() || x <= mins.top()) mins.push(x);
+
+    void push(int val) {
+        st.push(val);
+        if (mins.empty() || val <= mins.top()) {
+            mins.push(val);
+        }
     }
     void pop() {
-        if (s.top() == mins.top()) mins.pop();
-        s.pop();
+        if (st.empty()) {
+            throw runtime_error("empty stack");
+        }
+        if (st.top() == mins.top())
+            mins.pop();
+        st.pop();
     }
-    int top() const { return const_cast<stack<int>&>(s).top(); }
-    int getMin() const { return const_cast<stack<int>&>(mins).top(); }
+
+    int top() {
+        if (st.empty()) {
+            throw runtime_error("empty stack");
+        }
+        return st.top();
+    }
+
+    int getMin() {
+        if (mins.empty()) {
+            throw runtime_error("empty stack");
+        }
+        return mins.top();
+    }
 };
+
+/**
+ * Your MinStack object will be instantiated and called as such:
+ * MinStack* obj = new MinStack();
+ * obj->push(val);
+ * obj->pop();
+ * int param_3 = obj->top();
+ * int param_4 = obj->getMin();
+ */

@@ -25,6 +25,20 @@ public:
     }
 };
 
+class Solution {
+public:
+    int removeElement(vector<int>& nums, int val) {
+        int w = 0;
+        for (int i = 0 ; i < nums.size() ; ++i) {
+            if (nums[i] != val) {
+                nums[w] = nums[i];
+                w ++;
+            }
+        }
+        return w;
+    }
+};
+
 /* Alternative（不保序、寫入更少；val 稀少時更省）
 #include <algorithm>
 class Solution {
