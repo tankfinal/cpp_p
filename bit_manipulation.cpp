@@ -13,6 +13,7 @@ string bin32(uint32_t x) {
     return s;
 }
 
+// -std=c++11 -O2
 int main() {
     cout << boolalpha; // 印 bool 為 true/false
 
