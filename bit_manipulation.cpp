@@ -152,7 +152,15 @@ int main() {
         const uint32_t WRITE = 1u << 1; // 0010
         const uint32_t EXEC  = 1u << 2; // 0100
 
+
+
         uint32_t perm = 0;
+
+        perm |= (READ | WRITE);
+        perm &= ~(READ | WRITE);
+
+
+
         perm |= READ;
         perm |= WRITE;
         cout << "[Flags]  perm=" << bin32(perm) << "  (R?" << bool(perm & READ)
