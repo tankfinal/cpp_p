@@ -35,8 +35,14 @@ int main() {
     // 2) clear bit
     {
         uint32_t a = x;
+
         int k = 2;
+
+        cout << "(1u << k):" << bin32(1u << k) << "\n";
+        cout << "~(1u << k):" << bin32(~(1u << k)) << "\n";
+        cout << "a:" << bin32(a) << "\n";
         a &= ~(1u << k);
+
         cout << "[Clear]  清第" << k << "位: " << bin32(a) << "  (十進位 " << a << ")\n";
     }
 
@@ -53,11 +59,15 @@ int main() {
         int k = 4;
         bool on = (x & (1u << k)) != 0;
         cout << "[Test]   第" << k << "位是否為1? " << on << "\n";
+
+        bool on2 = ((x >> k) & 1u) == 1;
+        cout << "[Test]   第" << k << "位是否為1? " << on2 << "\n";
     }
 
     // 5) 低8位 mask
     {
         uint32_t mask_low8 = (1u << 8) - 1u; // 0xFF
+        cout << " (1u << 8) = " << bin32(1u << 8) << "\n";
         cout << "[Mask]   低8位 mask: " << bin32(mask_low8) << "  (十進位 " << mask_low8 << ")\n";
         uint32_t low8 = x & mask_low8;
         cout << "         x的低8位: " << bin32(low8) << "  (十進位 " << low8 << ")\n";
@@ -66,14 +76,14 @@ int main() {
     // 6) 取得最低的1位 (isolate lowest set bit)
     {
         uint32_t a = x;                   // 22: ...010110
-        uint32_t lowest1 = a & (~a + 1);  // 等價於 a & -a（在二補數系統）
+        uint32_t lowest1 = a & (~a + 1);  // 等價於 a & -a（在二補數系統） ~a(101001) + 1 =  101010 & 010110 -> 000010
         cout << "[Low1]   取最低1位: " << bin32(lowest1) << "  (十進位 " << lowest1 << ")\n";
     }
 
     // 7) 清除最低的1位
     {
         uint32_t a = x; // 22
-        uint32_t b = a & (a - 1);
+        uint32_t b = a & (a - 1); // 010110 & 010101 (010110 - 1) = 010100
         cout << "[Clr1]   清最低1位: from " << bin32(a) << " -> " << bin32(b)
              << "  (十進位 " << b << ")\n";
     }
@@ -82,7 +92,16 @@ int main() {
     {
         uint32_t a = x;
         int cnt = 0;
-        while (a) { a &= (a - 1); ++cnt; }
+        while (a) {
+            a &= (a - 1);
+            /*
+             * 010110 - 1 = 010100 -> & 010110 = 010100
+             * 010100 - 1 = 010011 -> & 010100 = 010000
+             * 010000 - 1 = 001111 -> & 010000 = 000000
+             * c == 3;
+             */
+            ++cnt;
+        }
         cout << "[Popcnt] x共有 " << cnt << " 個1位\n";
     }
 
@@ -90,7 +109,15 @@ int main() {
     {
         uint32_t a = x;
         int parity = 0;
-        while (a) { parity ^= 1; a &= (a - 1); }
+        while (a) {
+            parity ^= 1;
+            /*
+             *  0 ^ 1 = 1, 010110 - 1 = 010100 -> & 010110 = 010100
+             *  1 ^ 1 = 0, 010100 - 1 = 010011 -> & 010100 = 010000
+             *  0 ^ 1 = 1, 010000 - 1 = 001111 -> & 010000 = 000000
+             */
+            a &= (a - 1);
+        }
         cout << "[Parity] x 一的個數是 " << (parity ? "奇數" : "偶數") << "\n";
     }
 
@@ -98,7 +125,9 @@ int main() {
     {
         uint32_t a = 5, b = 12; // 0101, 1100
         cout << "[XORswap] before a=" << a << ", b=" << b << "\n";
-        a ^= b; b ^= a; a ^= b;
+        a ^= b; // a = a ^ b;
+        b ^= a; // b = b ^ a;
+        a ^= b; // a = a ^ b;
         cout << "           after  a=" << a << ", b=" << b << "\n";
     }
 
@@ -108,8 +137,9 @@ int main() {
         uint32_t argb = (A << 24) | (R << 16) | (G << 8) | B;
         cout << "[Pack]   ARGB 打包: " << bin32(argb)
              << " (hex 0x" << hex << uppercase << argb << nouppercase << dec << ")\n";
+        cout << "hex=0x" << std::hex << argb << std::dec << "\n";
 
-        uint32_t A2 = (argb >> 24) & 0xFF;
+        uint32_t A2 = (argb >> 24);
         uint32_t R2 = (argb >> 16) & 0xFF;
         uint32_t G2 = (argb >> 8)  & 0xFF;
         uint32_t B2 = (argb)       & 0xFF;
