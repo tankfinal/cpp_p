@@ -69,25 +69,34 @@ public:
     // 建構函式
     InterruptSafeRingBuffer() : buffer_(Capacity + 1), head_(0), tail_(0) {}
 
-    // 禁止複製和賦值，因為這類資源管理類別通常不應該被複製
-    InterruptSafeRingBuffer(const InterruptSafeRingBuffer&) = delete;
-    InterruptSafeRingBuffer& operator=(const InterruptSafeRingBuffer&) = delete;
-
     // 寫入操作 (由生產者/ISR呼叫)
     // 使用 const T& 來接收，避免不必要的複製
     bool write(const T& item) {
+        // 步驟 1: 取得我「當前」準備要寫入的那個空格的索引。
+        // 假設 tail_ 現在是 4，代表 4 號格子是空的，我準備把東西放進去。
         const size_t current_tail = tail_.load(std::memory_order_relaxed);
+
+        // 步驟 2: 「預先計算」：如果我這次成功地在 4 號格子放了東西，
+        // 那麼 tail 指標下一步就要移動到 5 號了。
         const size_t next_tail = (current_tail + 1) % buffer_.size();
 
-        // 使用 acquire memory order 來讀取 head，確保能看到消費者執行緒對 head 的最新修改
+        // 步驟 3: 進行最關鍵的安全檢查！
+        // 這裡問的是：「我預計的下一個空格 (5 號)，是不是正好就是消費者 (head)
+        // 正準備要讀取的位置？」
         if (next_tail == head_.load(std::memory_order_acquire)) {
-            return false; // 緩衝區已滿
+            // 如果 next_tail (5號) == head (也是5號)，這代表什麼？
+            // 代表 tail 已經把 head 前面的所有格子都填滿了，
+            // tail 跑了一圈，正好追到了 head 的屁股後面。
+            // 整個緩衝區已經滿了，沒有「下一個空格」了。
+            return false; // 所以，我不能寫入，拋棄這次的 item。
         }
 
+        // 步驟 4: 既然檢查通過了，代表是安全的。
+        // 我就把 item 放到我一開始就準備好的那個空格 `current_tail` (4號) 裡。
         buffer_[current_tail] = item;
 
-        // 使用 release memory order 來更新 tail，確保對 buffer 的寫入操作
-        // 對於之後讀取 tail 的消費者執行緒是可見的
+        // 步驟 5: 我已經成功放好東西了，現在更新 tail 指標，
+        // 讓它指向下一個真正的空格 `next_tail` (5號)。
         tail_.store(next_tail, std::memory_order_release);
         return true;
     }

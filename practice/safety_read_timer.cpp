@@ -40,6 +40,17 @@ uint64_t read_timer() {
     return ((uint64_t)high1 << 32) | low;
 }
 
+uint64_t read_timer_with_irq_disabled() {
+    disable_irq(); // 進入臨界區，沒有人能打擾我
+
+    uint32_t low = MOCK_TIMER_LOW;
+    uint32_t high = MOCK_TIMER_HIGH;
+
+    enable_irq(); // 離開臨界區
+
+    return ((uint64_t)high << 32) | low;
+}
+
 // --- main 函式用於測試 ---
 int main() {
     std::cout << "--- Testing Safe Hardware Timer Read ---" << std::endl;
