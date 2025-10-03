@@ -23,14 +23,20 @@ private:
 
     // 模擬一個慢速的、可被喚醒的 I/O 操作
     void stoppable_slow_io() {
-        std::unique_lock<std::mutex> lock(mtx_);
+        std::unique_lock lock(mtx_);
         std::cout << "[Worker] Starting slow I/O, will wait up to 10 seconds..." << std::endl;
 
         // cv_.wait_for: 等待一段時間，或直到被 notify() 喚醒
         // 它會檢查一個 predicate (第三個參數)，如果為 true 就直接返回，避免 spurious wakeups
         if (cv_.wait_for(lock, std::chrono::seconds(10), [this]{ return is_cancelled_.load(); })) {
+            // 這裡是 true 的情況：
+            // 代表 wait_for 是因為 is_cancelled_ 變成了 true 而返回。
+            // 這一定是 cancel() 函式呼叫了 notify_one() 造成的。
             std::cout << "[Worker] Woken up because task was cancelled." << std::endl;
         } else {
+            // 這裡是 false 的情況：
+            // 代表等待了整整 10 秒鐘，is_cancelled_ 始終是 false，
+            // notify_one() 也沒有被呼叫。是超時了。
             std::cout << "[Worker] I/O operation finished normally after timeout." << std::endl;
         }
     }
