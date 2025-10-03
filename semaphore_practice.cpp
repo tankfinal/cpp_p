@@ -123,6 +123,7 @@ int main() {
         }
     });
 
+
     // 建立一個消費者執行緒
     std::thread consumer([&]() {
         for (int i = 0; i < 10; ++i) {
